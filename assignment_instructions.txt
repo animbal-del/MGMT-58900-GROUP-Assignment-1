@@ -1,0 +1,52 @@
+Group Assignment 1
+Please read the 'Introduction to Vibe Coding' (Link) and ‘Airbnb dataset description’. Using the airbnb_dallas.csv dataset, answer the following questions.
+Please record a video (minimum 15 minutes) of your group collaborating on this assignment, using Microsoft Teams only (no Zoom or other platforms). This recording and meeting transcript will be evidence of contributions to the group assignment and group dynamics. 
+All group members must have their cameras on during the recording. 
+Download the Teams transcript of the call as a .docx file.  
+This meeting should not be a presentation of your work, nor just a discussion of who will do what, etc. Instead, it must capture your group's actual analysis and decision-making process.
+
+Questions
+Calculate the range and interquartile range (IQR) of Nightly Rate for the dataset. What do these measures tell you about the spread and variability of nightly rates across different listings?
+
+Provide a summary of key descriptive statistics (mean, median, standard deviation, minimum, and maximum) for booked_days and revenue. How do these statistics help you understand the overall performance of the properties?
+
+What can you infer about booking patterns for Superhosts compared to non-Superhosts? Determine the best way to visualize the booked_days data and explain your findings.
+
+Are there any seasonal patterns in the booking days for Superhosts? Select the best approach to visualize the trend in booked_days over different periods and discuss the patterns you identify.
+
+How does Superhost status impact the number of reviews a property receives? Choose an appropriate method to compare the numReviews_pastYear for Superhosts and non-Superhosts.
+
+Use a histogram to visualize the distribution of revenue for listings. How does the distribution differ between properties with Superhost status and those without?
+
+Create a bar chart comparing the average revenue for properties before and after gaining Superhost status. Does the revenue increase for properties that become Superhosts?
+
+Use a line chart to illustrate the trend in revenue over multiple evaluation periods for Superhosts. How does Superhost status impact revenue over time?
+
+Create a scatter plot to examine the relationship between rating_ave_pastYear and revenue. What correlation exists between ratings and revenue?
+
+What listing type dominates bookings for Superhosts? Decide on the best way to visualize the composition of bookings by Listing Type and explain your conclusions.
+
+Use a correlation matrix heatmap to explore the relationships between revenue, occupancy_rate, rating_ave_pastYear, and numReviews_pastYear. Which variables show the strongest correlations, and how might these impact business decisions for hosts?
+
+Which neighborhoods show the highest revenue and occupancy rates for Superhosts? Determine the best way to visualize and analyze this information.
+
+How does being a Superhost affect the pricing strategy, particularly in terms of nightly rates? Decide on an appropriate chart type to explore and present your findings.
+
+What does the number of 5-star reviews tell you about its impact on revenue generation? Choose a suitable visualization method to analyze this relationship and explain your insights.
+
+Use maps or neighborhood-level data to tell a “story of place”. What role does location play in pricing or bookings, and how would you present that insight to Airbnb management?
+
+Suppose you are on Airbnb’s management team. Based on your data exploration, propose one change (e.g., Superhost assignment criteria, pricing strategy, or neighborhood marketing). Support your recommendation with evidence from the dataset by justifying a KPI (e.g., revenue, occupancy, reviews, or location patterns), and briefly explain the trade-offs Airbnb should consider.
+
+
+Deliverables:
+Please convert your .ipynb file to a PDF and submit the PDF. Ensure that each question in the notebook is clearly labeled.
+How to convert a Colab .ipynb file to a PDF:
+Open your Colab notebook in your web browser.
+Go to the "File" menu at the top left.
+Select "Print" from the dropdown menu.
+In the print dialog, change the destination to "Save as PDF" or a similar option.
+
+Please submit a doc with your video meeting recording link, and your entire meeting transcript.  
+
+

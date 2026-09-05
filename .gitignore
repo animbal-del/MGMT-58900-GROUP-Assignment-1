@@ -1,0 +1,11 @@
+# macOS
+.DS_Store
+
+# Microsoft Word lock/owner files
+~$*
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Python
+__pycache__/
