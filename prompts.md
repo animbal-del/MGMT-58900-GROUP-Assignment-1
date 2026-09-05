@@ -1,6 +1,6 @@
 # Group Assignment 1 — Prompt Log
 
-MIS 589 · Airbnb Dallas dataset
+MIS 58900 · Airbnb Dallas dataset
 
 This file records, for each of the 16 questions, how we interpreted the question and the
 exact prompt used to generate the code. Written before any code was generated.
@@ -48,6 +48,13 @@ Read these once; several questions are easy to get wrong without them.
    in our written answer.
 5. State the row count used and the number of rows dropped for missing values.
 6. Keep each question's code in its own cell under a markdown heading `## Question N`.
+7. End every answer with what the finding means for a business decision. Name the analysis
+   type (descriptive / predictive / prescriptive) and the lever it pulls — operational
+   excellence, product/service innovation, customer intimacy or value-chain coordination for
+   value creation; pricing or unit economics for value capture. Questions 11, 15 and 16 ask
+   for this in so many words; the rest are graded on it regardless.
+8. Distinguish groups by marker shape, linestyle or hatch as well as colour. The deliverable
+   is a PDF that will be read in greyscale, where a colour-only encoding disappears.
 
 ---
 
@@ -70,6 +77,13 @@ dominate the range. Report them rather than deleting them quietly.
 > `Neighborhood` so we can judge whether the extremes are real listings or data errors.
 > Do not remove outliers.
 
+**Revision after seeing the data.** The five highest rates are the same property observed in
+five periods, so "top 5 rows" is not "top 5 listings". Since the question asks about spread
+"across different listings", we added a listing-level check: collapsing to one median rate per
+`Airbnb Property ID` (9,599 listings, against 48,711 rows) gives range $1,899, IQR $108.10,
+median $105.00 — materially the same answer. Worth one line in the write-up, because it shows
+the conclusion is not an artefact of the panel structure.
+
 ---
 
 ## Question 2 — Descriptive statistics for booked_days and revenue
@@ -89,6 +103,13 @@ interpretable; revenue has no upper bound.
 > as a single pandas DataFrame with the statistics as rows and the two variables as columns.
 > Below the table, print the ratio of mean to median for each variable and the number of
 > null values in each.
+
+**Revision after seeing the data.** 16,861 of 48,711 property-periods (34.6%) have no booked
+days, recorded as null rather than zero — so `dropna` is the right filter, but it silently
+removes a third of the inventory. The question asks how the statistics describe "the overall
+performance of the properties", so the full-population figures should lead and the
+booked-only subset follow. Reporting only booked rows answers a narrower question than the
+one asked, and the idle third is arguably the most important performance finding in it.
 
 ---
 
@@ -137,6 +158,13 @@ covers before averaging months across years, and say so.
 > monthly means as a table. Also print the count of rows behind each month so we can see if
 > any month is thinly sampled.
 
+**Revision after seeing the data.** The scrape is quarterly. Only 8 of 12 calendar months
+appear at all, and 4 of those hold a few dozen straggler rows against 3,000+ in the genuine
+scrape months, so we read the pattern off the four well-sampled months (Feb, May, Aug, Nov)
+and exclude the rest. Note also that the question's wording admits two readings — "seasonal"
+points at calendar months, "over different periods" points at `superhost_period_all`. We
+report both and say so, rather than picking one and hoping it was the intended one.
+
 ---
 
 ## Question 5 — Superhost status and number of reviews
@@ -158,6 +186,19 @@ partly awarded on the basis of review activity, so we cannot claim the badge cau
 > plots; (3) a Welch's t-test using scipy.stats.ttest_ind with equal_var=False, printing the
 > t-statistic and p-value; (4) a Mann-Whitney U test as a non-parametric check, printing the
 > statistic and p-value. Print how many rows were dropped for null `numReviews_pastYear`.
+
+**Revision after seeing the data.** This prompt did not anticipate the confound that decided
+the answer. Superhosts turn out to have a *higher median* review count but a *lower mean*, and
+when two statistics contradict each other a p-value cannot adjudicate between them. The cause
+is that `numReviews_pastYear` scales with the size of the host's portfolio — it reflects the
+host, not the property — and large commercial operators are concentrated among non-Superhosts.
+Follow-up prompt used:
+
+> Count distinct `Airbnb Property ID` values per host in `df` and print mean
+> `numReviews_pastYear` by portfolio-size band. Then restrict to hosts with exactly one listing
+> and re-run the Superhost / non-Superhost comparison, printing count, mean and median per
+> group. Report Cohen's d alongside the p-values, since at n ≈ 37,000 almost any difference
+> reaches significance and effect size is the more informative number.
 
 ---
 
@@ -205,6 +246,20 @@ rather than only the difference of the two means.
 > print the percentage of properties whose revenue increased, and run a paired t-test
 > (scipy.stats.ttest_rel) on the before and after values, dropping rows where either is null.
 
+**Revision after seeing the data.** The before/after comparison on its own said revenue *fell*
+after the badge was gained, which taken at face value would mean becoming a Superhost hurts
+revenue. That is almost certainly an artefact: "before" and "after" are different quarters, and
+Question 4 established that bookings swing seasonally. The prompt above has no control group,
+so a seasonal move and a badge effect are indistinguishable in it. Follow-up prompt used:
+
+> Build a control group of properties that did *not* gain Superhost status, measured across the
+> same period transitions as the gainers. Compute the mean period-over-period revenue change for
+> both groups, matched on the period mix in which gains actually occurred, and report the
+> difference-in-differences. Print the row counts behind every figure.
+
+This is the question the standing note at the foot of this file was written for: when the answer
+looks strange, suspect the interpretation before the code.
+
 ---
 
 ## Question 8 — Revenue trend over evaluation periods for Superhosts
@@ -246,6 +301,31 @@ correlation here may just reflect that almost every property has a high rating.
 > after dropping nulls. Also print the distribution of `rating_ave_pastYear` in deciles so we
 > can see how concentrated ratings are.
 
+**Revision after seeing the data.** The rating distribution turned out to govern the whole
+answer, and the prompt above does not ask for most of what the finished cell does. Two
+discoveries drove the additions. First, **range restriction**: SD 0.246 with 90.1% of rows at
+4.5 or above, and within Superhosts SD 0.085 with 99.8% at 4.6+ — so a near-zero Pearson is
+partly an artefact of the ratings system, not a finding about quality. That is why the concentration
+table is printed *before* the scatter and why the split-by-Superhost panel was added: it
+demonstrates the mechanism (less range, less correlation). Second, the relationship **bends** —
+mean revenue rises to $3,345 in the 4.8–4.99 band then falls to $2,916 at exactly 5.0. A linear
+coefficient cannot see that, which is why the banded table was added. Follow-up prompt used:
+
+> Add to the Q9 cell: (1) a rating-concentration block printed before the chart — percentiles,
+> SD, and the shares at >=4.5, >=4.8, ==5.0 and <4.0; (2) a table of mean revenue, median
+> revenue, median `booked_days` and **median `numReviews_pastYear`** across the rating bands
+> <=4.0, 4.0–4.4, 4.4–4.6, 4.6–4.8, 4.8–4.99 and 5.0 exactly; (3) a second panel splitting the
+> scatter by Superhost status with a shared y-axis, distinct markers and linestyles, and group
+> sizes in the legend; (4) robustness checks — Pearson on log revenue, Pearson and Spearman
+> within each Superhost group, and the correlation restricted to rows with
+> `numReviews_pastYear >= 10`; (5) a re-run on `revenue_z` across all rated rows so the
+> never-booked periods enter as 0. Print the SD and group shares that the write-up quotes.
+
+The median-review column is what made the answer correct rather than merely plausible: rows at
+exactly 5.0 carry a median of 7 reviews against 143 and 62 in the neighbouring bands, so a
+perfect score is mostly a thin-evidence score. Without that column the table reads as "five
+stars reduce revenue", which is wrong.
+
 ---
 
 ## Question 10 — Listing type composition of Superhost bookings
@@ -266,6 +346,34 @@ want to show the non-Superhost split alongside, which a pie can't do cleanly.
 > listing type. Then produce the same table and chart for non-Superhosts and print the two
 > shares side by side so we can compare the composition.
 
+**Revision after seeing the data.** The plan above — a horizontal bar of booked-night shares —
+was right about the *measure* and wrong about the *chart*, and it missed the finding entirely.
+Three things forced a redesign. First, `Listing Type` has **four** values, not the three listed
+at the top of this file: Hotel room (111 rows) exists and first appears at
+`superhost_period_all` = 8, so its arrival is a source taxonomy change rather than a segment
+that grew. Second, and the actual result: the answer depends on which denominator you use.
+Entire home/apt is 74.5% of Superhost booked nights but **89.1% of Superhost revenue**, because
+it earns $145.61 per booked night against $54.67 for a private room. Reporting nights alone
+would have a manager ranking segments the revenue ledger ranks differently. Third, the
+intuitive story is false: the listing *mix* is near-identical across groups (76.6% vs 75.1%
+entire home), and Superhost bookings are in fact **more** tilted toward private rooms (22.1%)
+than non-Superhost bookings (15.7%) — the opposite of "Superhosts favour entire homes".
+Follow-up prompt used:
+
+> Replace the single bar with a two-panel figure of 100% stacked horizontal bars sharing a
+> 0–100% x-axis. Panel A: Superhost vs non-Superhost by share of booked nights. Panel B:
+> Superhosts only, three bars — % of listings, % of booked nights, % of revenue — so the
+> denominators can be read against each other. Give every listing type a distinct fill **and**
+> hatch. Add a table of mean booked nights per on-market property-period by type x Superhost
+> status to separate composition from booking intensity, a check that the shares are unchanged
+> when collapsed to one row per property, and a by-period pivot to test whether the headline
+> share is stable. Print the shared-room host concentration and the first period in which
+> Hotel room appears.
+
+The by-period check earned its place: the entire-home share drifts from 65.6% (period 5) to
+84.2% (period 20), so the pooled 74.5% averages a moving target — the same mistake Question 8's
+revision corrected.
+
 ---
 
 ## Question 11 — Correlation matrix heatmap
@@ -283,7 +391,14 @@ written answer should say so rather than presenting it as a finding.
 > `rating_ave_pastYear`, and `numReviews_pastYear`, using pairwise complete observations.
 > Print the matrix rounded to two decimals and print the number of rows used. Plot it as a
 > seaborn heatmap with annotations, a diverging colormap centered at 0, and vmin=-1, vmax=1.
-> Also print the same matrix using Spearman correlation.
+> Also print the same matrix using Spearman correlation. Finally, print a short note stating
+> that `revenue` and `occupancy_rate` are mechanically linked — revenue is roughly nights
+> booked times price — so a strong correlation between those two is arithmetic rather than a
+> business finding, and rank the remaining pairs by strength.
+
+**Note on scope.** This question has two halves and the second is easy to drop: "...and how
+might these impact **business decisions for hosts**?" A heatmap plus coefficients answers only
+the first. The write-up has to close on what a host should actually do differently.
 
 ---
 
@@ -399,6 +514,11 @@ change.
 - Everything above is our interpretation before running any code. If a question's answer
   looks strange when we run it, check this file first — the interpretation may be what is
   wrong, not the code.
+- Where the data contradicted an assumption, we left the original prompt in place and added a
+  **"Revision after seeing the data"** block beneath it with the follow-up prompt actually
+  used. Questions 1, 2, 4, 5, 7, 9 and 10 have one. The revisions are the point, not an admission —
+  the spec changing when the evidence demanded it is the process this assignment is asking us
+  to show.
 - Question 7 is the one most likely to be done incorrectly by a quick prompt. Make sure the
   before/after comparison uses `superhost_change_gain_superhost` and the `prev_` columns.
 - Questions 3, 4, 5, 10, 12, 13, 14 and 15 all say "choose the best way to visualize."
