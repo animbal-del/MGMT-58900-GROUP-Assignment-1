@@ -551,6 +551,44 @@ five-star, and the raw count partly just measures how long a property has been b
 > `prop_5_StarReviews_pastYear` vs `revenue`, so we can separate volume of five-star reviews
 > from the proportion of them. Print row counts used.
 
+**Revision after seeing the data.** The plan above was right that count and proportion differ,
+but wrong about why, and the real finding is a **null** that the drafted scatter could not have
+shown. Three discoveries.
+
+**`num_5_star_Rev_pastYear` is a host metric, not a property one.** It is constant across every
+property a host owns in a period — 0 of 17,609 host-periods vary, including all 4,731
+multi-property ones. So it confounds listing quality with operator scale: Spearman(count, host
+portfolio size) = **+0.640**, median portfolio 1, 2, 3, 13, 32 across count quintiles. The same
+trap Question 5 hit on `numReviews_pastYear`.
+
+**The two columns are algebraically one variable.** `prop = count / numReviews` **exactly**, and
+the count shares **98.2%** of its variance with `numReviews_pastYear` (r = +0.991) while the
+proportion correlates with `rating_ave_pastYear` at +0.977. So "count vs proportion" is
+"review volume vs average rating" — the two predictors Question 11 already assessed. Q14 adds no
+new variable; it re-splits theirs.
+
+**Nothing survives the controls.** Partial Pearson against revenue: raw +0.083, controlling
+review volume +0.088, controlling booked nights +0.029, controlling **both +0.023** (r² =
+0.0005). Normalised by exposure (5-star per booked night) the sign **flips negative**
+(-0.079 / -0.186). Demeaned within property, so the same listing is compared to itself, it is
+-0.013 / -0.091. The count is a record of past bookings, not a driver of future ones.
+
+Follow-up prompt used:
+
+> Before charting, establish what the variable is: check whether `num_5_star_Rev_pastYear`
+> varies within `Airbnb Host ID` x `superhost_period_all`, whether `prop_5_StarReviews_pastYear`
+> equals count/`numReviews_pastYear` exactly, and how strongly the count correlates with
+> `numReviews_pastYear` and with host portfolio size. Then replace the scatter with box plots of
+> `revenue` across count quintiles and proportion bands, and add a partial-correlation table
+> residualising on `numReviews_pastYear` and `booked_days` separately and together. Add an
+> exposure-normalised variant (count / `booked_days`) and a within-property demeaned variant.
+> Chart the attenuation across specifications as a bar chart so the collapse is visual.
+
+**A methods note worth keeping.** Partial *rank* correlation is ambiguous — Spearman of OLS
+residuals gives +0.161 under both controls where rank-transform-then-residualise gives +0.076.
+Both are legitimate; they are different estimators, not a reproduction failure. The cell prints
+both, names which it plots, and quotes the unambiguous Pearson partials in the prose.
+
 ---
 
 ## Question 15 — Story of place
@@ -605,7 +643,7 @@ change.
   wrong, not the code.
 - Where the data contradicted an assumption, we left the original prompt in place and added a
   **"Revision after seeing the data"** block beneath it with the follow-up prompt actually
-  used. Questions 1, 2, 4, 5, 7, 9, 10, 11, 12 and 13 have one. The revisions are the point, not an admission —
+  used. Questions 1, 2, 4, 5, 7, 9, 10, 11, 12, 13 and 14 have one. The revisions are the point, not an admission —
   the spec changing when the evidence demanded it is the process this assignment is asking us
   to show.
 - Question 7 is the one most likely to be done incorrectly by a quick prompt. Make sure the
