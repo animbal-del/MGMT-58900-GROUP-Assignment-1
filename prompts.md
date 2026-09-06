@@ -388,13 +388,24 @@ written answer should say so rather than presenting it as a finding.
 
 **Prompt.**
 > Build a correlation matrix in `df` for the columns `revenue`, `occupancy_rate`,
-> `rating_ave_pastYear`, and `numReviews_pastYear`, using pairwise complete observations.
+> `rating_ave_pastYear`, and `numReviews_pastYear`, using **listwise** complete cases — drop
+> rows null on any of the four, so every cell of the matrix rests on the same rows.
 > Print the matrix rounded to two decimals and print the number of rows used. Plot it as a
 > seaborn heatmap with annotations, a diverging colormap centered at 0, and vmin=-1, vmax=1.
 > Also print the same matrix using Spearman correlation. Finally, print a short note stating
 > that `revenue` and `occupancy_rate` are mechanically linked — revenue is roughly nights
 > booked times price — so a strong correlation between those two is arithmetic rather than a
 > business finding, and rank the remaining pairs by strength.
+
+**Revision after seeing the data.** The prompt above originally said *pairwise* complete
+observations. That is wrong here, for a reason that only shows up once Question 9 exists:
+pairwise varies the sample per cell (26,686 to 37,082 rows) and yields revenue~numReviews
+Spearman 0.219 and revenue~occupancy 0.549, where Question 9 printed 0.215 and 0.544 on its
+complete-case frame. The two cells would disagree inside the same PDF. Listwise keeps every
+coefficient on the same 26,686 rows and matches Q9 exactly, at the cost of dropping 22,025 rows
+— which are not missing at random (they are largely the listed-but-unbooked and off-market
+periods from Q2/Q3), so the matrix describes listings that actually booked and were reviewed.
+Say that rather than presenting it as the Dallas market as a whole.
 
 **Note on scope.** This question has two halves and the second is easy to drop: "...and how
 might these impact **business decisions for hosts**?" A heatmap plus coefficients answers only
@@ -516,7 +527,7 @@ change.
   wrong, not the code.
 - Where the data contradicted an assumption, we left the original prompt in place and added a
   **"Revision after seeing the data"** block beneath it with the follow-up prompt actually
-  used. Questions 1, 2, 4, 5, 7, 9 and 10 have one. The revisions are the point, not an admission —
+  used. Questions 1, 2, 4, 5, 7, 9, 10 and 11 have one. The revisions are the point, not an admission —
   the spec changing when the evidence demanded it is the process this assignment is asking us
   to show.
 - Question 7 is the one most likely to be done incorrectly by a quick prompt. Make sure the
