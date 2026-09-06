@@ -431,6 +431,42 @@ sample size, because a neighborhood with three listings can top a ranking on noi
 > (x) against mean revenue (y) with one point per neighborhood, labeling the top 10 by
 > revenue. Print the full grouped table sorted by mean revenue.
 
+**Revision after seeing the data.** Three parts of the plan above break on this dataset.
+(1) **"Top 15 neighborhoods" assumes many categories; there are only 17**, so a top-15 is a
+list, not a ranking. (2) **The "fewer than 30 rows" filter does not filter.** This is panel
+data — three properties observed across thirteen periods give thirteen rows — so a row
+threshold counts repeat observations of the same listing as independent evidence, and drops
+only 2 of 17. We set the threshold in distinct **properties** instead (>= 20), keeping 11.
+(3) **Mean revenue picks the wrong winner.** Lake Highlands leads on mean ($6,088) purely
+because the top 5 of its 78 Superhost properties supply 66.6% of its revenue; its median is
+$1,948, ranking 6th. Median is the headline, with the sensitivity printed so the choice is
+visible.
+
+The larger addition is a trap check the plan had no way to anticipate before Question 10
+existed. Superhost revenue per booked night runs $145.61 for an entire home against $54.67 for
+a private room, so a neighbourhood can top a revenue ranking on inventory mix alone — and it
+does: entire-home share correlates with neighbourhood median revenue at **r = +0.822**, and
+holding listing type constant moves 5 of 11 neighbourhoods by three or more rank places
+(Northwest Dallas 5th -> 1st, Lakewood 3rd -> 8th). Follow-up prompt used:
+
+> For Superhosts, keep neighbourhoods with at least 20 distinct `Airbnb Property ID` values.
+> Report median as the headline with mean alongside and a trimmed-mean sensitivity check.
+> Produce two ranked horizontal bar panels — median revenue, then median occupancy **in the
+> revenue panel's category order, not re-sorted** — plus a scatter of median realised nightly
+> rate against median occupancy with quadrant lines at the city-wide Superhost medians. Then
+> test whether the revenue ranking is a listing-type artefact: correlate entire-home share with
+> median revenue, and re-rank within `Listing Type == "Entire home/apt"` only, printing the
+> rank shift. Also re-rank on the on-market frame with idle periods as $0 to show whether the
+> ranking is robust to frame choice.
+
+**One result worth recording, because it contradicts Question 11.** Within properties, Q11
+found realised nightly price *falls* as occupancy rises. Across neighbourhoods the sign
+reverses: Spearman(median occupancy, median realised rate) = **+0.600** — busier districts are
+generally pricier. There is no neighbourhood-level plateau, and the notebook says so
+explicitly. The underpricing story survives only as a three-neighbourhood quadrant exception
+(Lakewood, Northwest Dallas, Forest Hills/Casa Linda). A relationship that holds at one level
+of aggregation does not transfer to another; Question 16 needs care on exactly this point.
+
 ---
 
 ## Question 13 — Superhost status and pricing strategy
@@ -527,7 +563,7 @@ change.
   wrong, not the code.
 - Where the data contradicted an assumption, we left the original prompt in place and added a
   **"Revision after seeing the data"** block beneath it with the follow-up prompt actually
-  used. Questions 1, 2, 4, 5, 7, 9, 10 and 11 have one. The revisions are the point, not an admission —
+  used. Questions 1, 2, 4, 5, 7, 9, 10, 11 and 12 have one. The revisions are the point, not an admission —
   the spec changing when the evidence demanded it is the process this assignment is asking us
   to show.
 - Question 7 is the one most likely to be done incorrectly by a quick prompt. Make sure the
