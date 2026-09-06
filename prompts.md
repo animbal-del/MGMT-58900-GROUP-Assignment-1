@@ -488,6 +488,48 @@ a composition effect.
 > chart of median nightly rate by listing type and Superhost status. Print the median
 > difference overall and within each listing type.
 
+**Revision after seeing the data.** The plan above answers "do Superhosts charge differently",
+but the question asks how *being* a Superhost **affects** pricing — causal phrasing that a
+cross-sectional split cannot address. Three additions followed.
+
+**The headline came out backwards.** Superhosts list **lower**, not higher: median $100.00 vs
+$112.50 (-11.1%, Cohen's d = -0.156). It survives every control — all four listing types, every
+bedroom band, and a collapse to one median per property — and Superhosts run *larger* homes
+(1.706 vs 1.483 bedrooms) while still pricing below. Flagged here so nobody "fixes" it.
+
+**The strategy finding is the listed-to-realised gap, not the level.** Superhosts realise
+**-9.24%** against their listed rate where non-Superhosts realise **-16.18%**, and 34.2% of
+their booked periods realise *above* listed against 26.8%. The two groups converge on realised
+price ($89.95 vs $100.00) while diverging on listed. The mechanism is adjustment frequency:
+34.9% of Superhost within-property price changes are exactly zero against 50.1%, i.e. they
+re-price **1.30x** as often. That is dynamic-pricing discipline, not a quality premium.
+
+**The 99th-percentile cap in the draft makes the violin unreadable** — p99 is $1,059 against a
+$107.50 median. Capped the *axis* at the 95th ($400) while computing every statistic on all
+rows.
+
+Follow-up prompt used:
+
+> Add to Q13: (1) medians within each `Listing Type` and within `Bedrooms` bands, with Cohen's
+> d, to test whether the gap is composition; (2) a period-by-period table of median
+> `Nightly Rate` by group, since a pooled figure may average different regimes; (3) the
+> listed-vs-realised gap `(booked_days_avePrice - Nightly Rate) / Nightly Rate`, by group and
+> listing type, plus the share of within-property price changes that are exactly zero;
+> (4) a within-property before/after on `superhost_change_gain_superhost == 1` using
+> `prev_Nightly Rate`, with a period-matched control for difference-in-differences and a
+> falsification check on properties that *lost* the badge.
+
+**Two results that stopped the answer over-claiming.** Gaining the badge moves the listed rate
+by a median of **exactly $0.00**, and properties that *lost* the badge moved identically
+(-$5.51 vs -$5.69, median $0.00 both) — if losing it moves price the same as gaining it,
+neither is a badge effect. And a **structural break at period 17**: the non-Superhost
+entire-home median falls $200 -> $159.88 -> $89.00 across periods 15-17 and stays there. A
+market-wide halving in one quarter that holds is a source or measurement change, not a price
+crash — the same species of artefact as Hotel room appearing at period 8 in Q10. The Superhost
+discount exists only in periods 12-16 and vanishes afterwards, so the pooled "11% lower" is
+averaging two regimes. 553 of the 2,940 badge-gain events sit in period 17, which is what drives
+the raw before/after decline the DiD strips out.
+
 ---
 
 ## Question 14 — Five-star reviews and revenue
@@ -563,7 +605,7 @@ change.
   wrong, not the code.
 - Where the data contradicted an assumption, we left the original prompt in place and added a
   **"Revision after seeing the data"** block beneath it with the follow-up prompt actually
-  used. Questions 1, 2, 4, 5, 7, 9, 10, 11 and 12 have one. The revisions are the point, not an admission —
+  used. Questions 1, 2, 4, 5, 7, 9, 10, 11, 12 and 13 have one. The revisions are the point, not an admission —
   the spec changing when the evidence demanded it is the process this assignment is asking us
   to show.
 - Question 7 is the one most likely to be done incorrectly by a quick prompt. Make sure the
