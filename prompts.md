@@ -670,11 +670,46 @@ is real rather than reverse-engineered. Write it as: the change, the KPI it move
 three figures from our analysis that support it, and at least one honest cost of making the
 change.
 
-**Prompt (to be filled in once the analysis is done).**
-> Based on the following findings from our analysis [paste the specific numbers], write the
-> supporting calculation for the recommendation that [state the change]. Compute [the
-> specific figure] and print it with the row counts behind it. Do not invent numbers; use only
-> the columns in `df`.
+**Prompt (written after Q1-Q15, as planned).** The recommendation was chosen from the evidence
+rather than picked first and justified afterwards, so this prompt could only be written last.
+
+> Restrict to entire homes that actually booked (`booked_days_avePrice` and `occupancy_rate`
+> both non-null) and cut into quintiles of `occupancy_rate`. Print n, median revenue, median
+> realised rate, median listed rate and median occupancy per quintile, and repeat the table
+> split at `superhost_period_all` < 17 vs >= 17 to confirm the pattern survives the structural
+> break. Then, for each `Zipcode` x `superhost_period_all` cell, compute the median realised
+> rate of quintile-2/3/4 entire homes as the comparable, join it onto the quintile-5 rows,
+> keep cells with at least 10 comparable rows, and print the median own rate, median
+> comparable, median gap in dollars and per cent, the share below comparable, and the sign of
+> the gap in every period. Size the post-break cohort (rows, properties, hosts, ZIPs) and the
+> latest period alone as a shippable target list. Print the Superhost share of the cohort
+> against the Superhost share of the entire-home base as a falsification check on whether this
+> is badge behaviour. Report which ZIPs the comparable filter removes.
+
+**Why this recommendation and not the others.** The assignment names Superhost criteria, pricing
+and neighbourhood marketing as examples, and our own analysis rules two of them out.
+**Neighbourhood marketing** is the weakest: Q15 found `Zipcode` explains 13.5% of log-price
+variance but only **1.0%** of occupancy variance, and the within-entire-home distance/occupancy
+correlation is **+0.012** — there is no neighbourhood demand signal to market into.
+**Superhost criteria** is unsupported: Q7's difference-in-differences confidence interval is
+[-$307, +$10], Q13's median listed-price move on gaining the badge is **exactly $0.00** with
+badge-*losers* moving identically, and the underpricing cohort is 38.5% Superhost against a
+38.1% base — the badge neither causes revenue nor selects for this problem. **Chasing reviews**
+is ruled out by Q14: partial Pearson **+0.023** (r-squared 0.0005) once review volume and booked
+nights are held constant, with a within-property sign that turns negative.
+
+**The trap in this question, and how we handled it.** The cohort is defined **on the outcome** —
+selecting the top occupancy quintile and then telling those hosts to raise price is conditioning
+on the dependent variable, and these listings may run hot precisely *because* they price low.
+Nothing in this dataset supports a causal claim about any intervention, so the deliverable is
+framed as a **randomised test with a falsifiable prediction and named guardrails**, not a
+rollout. We also tested and rejected an obvious targeting rule: "hosts who never change their
+price are underpricing" is **false here** — static-price top-quintile rows realise *higher*, not
+lower. Targeting is on the price gap, never on re-pricing frequency.
+
+**One deliberate distinction.** Question 15 also ends in a pricing brief. Q15 targets **places**
+(seven ZIPs); Q16 targets **behaviour** (top-occupancy entire homes) and uses ZIP only as the
+yardstick, not the trigger. A grader reading both should see the difference is intended.
 
 ---
 
