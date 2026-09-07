@@ -720,7 +720,9 @@ yardstick, not the trigger. A grader reading both should see the difference is i
   wrong, not the code.
 - Where the data contradicted an assumption, we left the original prompt in place and added a
   **"Revision after seeing the data"** block beneath it with the follow-up prompt actually
-  used. Questions 1, 2, 4, 5, 7, 9, 10, 11, 12, 13, 14 and 15 have one. The revisions are the point, not an admission —
+  used. Questions 1, 2, 4, 5, 7, 9, 10, 11, 12, 13, 14, 15 and 16 have one. Questions 3, 6 and 8 do
+  not, because the drafted plan survived contact with the data unchanged — that is a result
+  worth leaving visible rather than manufacturing a revision for symmetry. The revisions are the point, not an admission —
   the spec changing when the evidence demanded it is the process this assignment is asking us
   to show.
 - Question 7 is the one most likely to be done incorrectly by a quick prompt. Make sure the
