@@ -615,6 +615,48 @@ export cleanly to PDF. A plain latitude/longitude scatter is enough.
 > neighborhoods with at least 30 rows, sorted by median revenue. Print the top 15 and bottom
 > 15 rows of that table.
 
+**Revision after seeing the data.** Two parts of the plan above were replaced, and the second
+replacement produced the answer.
+
+**The geography changed from `Neighborhood` to `Zipcode`.** `Neighborhood` puts **51.2%** of all
+properties in a single bucket ("Central Dallas") and is null for 725 properties — and the drafted
+**>=30-row** threshold is the same non-filter Question 12 already diagnosed on panel data.
+`Zipcode` gives 49 areas, zero nulls, a largest bucket of 16.4%, and **39 ZIPs clearing a >=30
+distinct-property threshold covering 98.7% of properties**. It also splits Central Dallas into 13
+ZIPs, which is what dissolves Q12's coarse-taxonomy complaint.
+
+**A distance gradient was added, and it is the story.** ZIP explains **13.5%** of the variance in
+log nightly rate but only **1.0%** of the variance in occupancy. Median rate falls monotonically
+with distance from downtown — $149 to $76 across six bands, Spearman **-0.288** — while occupancy
+does not move at all (**-0.023** overall, **+0.012** within entire homes). *Place sets what a
+night is worth, not whether it sells.* That asymmetry is the managerial content, and a
+neighbourhood table alone would never have surfaced it.
+
+Follow-up prompt used:
+
+> Compare `Neighborhood`, `Zipcode` and `census_tract` on category count, largest-category share,
+> nulls and how many categories clear 30 distinct properties, and pick the geography on that
+> evidence. Build the ZIP table with median listed rate, median realised rate, median occupancy,
+> median revenue, Superhost share and entire-home share. Add a property-level lat/long map
+> coloured by median rate and by median occupancy on identical axes. Compute distance from
+> downtown and plot median rate and median occupancy against distance bands, then repeat within
+> entire homes only. Re-rank the ZIPs within entire homes and show the rank shift as a dumbbell.
+> Split at period 17 and report whether the geographic ordering is stable.
+
+**A decomposition error worth recording, because it would have overstated the confound.** The
+first draft of this analysis reported the listing-mix control as collapsing the ZIP revenue
+spread from **9.1x to 2.6x**. It does not: the entire-home threshold drops 5 of the 39 ZIPs, and
+those five hold *both* extremes of the all-listings table. The honest three-way decomposition is
+**9.09x (39 ZIPs) -> 3.28x (the 34 common ZIPs, all listings) -> 2.61x (those same 34, entire
+homes only)**. Only the second step is the mix control. Comparing spreads across different
+samples and attributing the whole gap to a control is an easy error to make and a hard one to
+spot once it is in prose.
+
+**One exception the map shows and the trend line hides.** 75225 has the **highest** median rate
+of all 39 ZIPs ($220) at 10 km from downtown, with the **third-lowest** occupancy (0.082). The
+distance gradient is a tendency, not a rule, and the write-up names that case rather than letting
+a monotone line imply otherwise.
+
 ---
 
 ## Question 16 — Recommendation to Airbnb management
@@ -643,7 +685,7 @@ change.
   wrong, not the code.
 - Where the data contradicted an assumption, we left the original prompt in place and added a
   **"Revision after seeing the data"** block beneath it with the follow-up prompt actually
-  used. Questions 1, 2, 4, 5, 7, 9, 10, 11, 12, 13 and 14 have one. The revisions are the point, not an admission —
+  used. Questions 1, 2, 4, 5, 7, 9, 10, 11, 12, 13, 14 and 15 have one. The revisions are the point, not an admission —
   the spec changing when the evidence demanded it is the process this assignment is asking us
   to show.
 - Question 7 is the one most likely to be done incorrectly by a quick prompt. Make sure the
