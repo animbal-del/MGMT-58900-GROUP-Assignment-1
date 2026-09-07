@@ -3,7 +3,10 @@
 MIS 58900 · Airbnb Dallas dataset
 
 This file records, for each of the 16 questions, how we interpreted the question and the
-exact prompt used to generate the code. Written before any code was generated.
+exact prompt used to generate the code. The prompts and the "Dataset facts" below were written
+**before any code was generated**; everything labelled *"Revision after seeing the data"* was added
+afterwards, when the data contradicted the plan. The corrections block at the end of the facts
+records which of our starting assumptions turned out to be wrong.
 
 ---
 
@@ -32,11 +35,40 @@ Read these once; several questions are easy to get wrong without them.
 - **Rating and review columns.** `rating_ave_pastYear`, `numReviews_pastYear`,
   `num_5_star_Rev_pastYear`, `prop_5_StarReviews_pastYear`, `numCancel_pastYear`.
 - **Location columns.** `Neighborhood`, `Zipcode`, `Latitude`, `Longitude`, `census_tract`.
-- **Category columns.** `Listing Type` (Entire home/apt, Private room, Shared room),
+- **Category columns.** `Listing Type` (we assumed Entire home/apt, Private room, Shared room —
+  see correction 1 below),
   `Property Type`, `Bedrooms`, `Bathrooms`.
-- **Missing values are real.** Several columns have blanks (e.g. `prev_` columns are empty
-  for a property's first period). Every prompt below says to report how many rows were
-  dropped rather than silently dropping them.
+- **Missing values are real.** Several columns have blanks. Every prompt below says to report
+  how many rows were dropped rather than silently dropping them.
+
+### Corrections to the facts above, found during the analysis
+
+Five of our starting assumptions were wrong. They are corrected here rather than edited away,
+because the prompts below were written against the original version.
+
+1. **`Listing Type` has four values, not three.** `Hotel room` (111 rows) exists and first appears
+   at `superhost_period_all` = 8, so its arrival is a source taxonomy change rather than a segment
+   that grew. Q10 works from the corrected list.
+2. **`occupancy_rate` is `booked_days / available_days`**, verified on 100% of rows, and
+   `booked_days > available_days` on none. So `available_days` is the **total exposure window**
+   (median 171 days), not the unbooked remainder. Two consequences: `revenue` and `occupancy_rate`
+   are mechanically linked, since `revenue == booked_days x booked_days_avePrice` holds exactly;
+   and because periods are ~91 days apart, a property's "before" and "after" share about **47%** of
+   their measurement window, which attenuates any period-over-period effect toward zero. Q7 and Q13
+   both say so.
+3. **The review columns are recorded at HOST level, not property level.** `num_5_star_Rev_pastYear`
+   is identical across every property a host owns in a period (0 of 17,609 host-periods vary), and
+   `numReviews_pastYear` behaves the same way. They confound listing quality with operator scale —
+   Spearman(5-star count, host portfolio size) = +0.640. Q5 and Q14 both had to control for this.
+4. **"Most columns have a `prev_` twin" overstates it** — 29 of 111 columns, about a quarter. The
+   headline measures do have one, which is what matters for Q7 and Q13.
+5. **`prev_` columns are not empty simply because a period is the property's first.** Only 58.9% of
+   first-observation rows have a null `prev_revenue`, and 34.0% of *non*-first rows have one too.
+   The nulls track the underlying measure being absent (a period with no booking has no revenue to
+   carry forward), not the property's position in the panel.
+6. **`Integrated Property Manager` is 100% null** and cannot be used to identify professional
+   operators. Use portfolio size via `nunique` properties per `Airbnb Host ID` instead, as Q5, Q12
+   and Q14 do.
 
 ### Standing instructions attached to every code prompt
 
@@ -47,7 +79,7 @@ Read these once; several questions are easy to get wrong without them.
 4. Print the numbers the chart is based on, not just the picture, so we can quote figures
    in our written answer.
 5. State the row count used and the number of rows dropped for missing values.
-6. Keep each question's code in its own cell under a markdown heading `## Question N`.
+6. Keep each question's code in its own cell under a markdown heading `# Question N`.
 7. End every answer with what the finding means for a business decision. Name the analysis
    type (descriptive / predictive / prescriptive) and the lever it pulls — operational
    excellence, product/service innovation, customer intimacy or value-chain coordination for
